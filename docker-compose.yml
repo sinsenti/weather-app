@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:13-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: weather_db
+      POSTGRES_USER: weather_user
+      # Use the same password as in .env file for DATABASE_URL
+      POSTGRES_PASSWORD: sin
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U weather_user -d weather_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  web:
+    build: .
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      OPENWEATHER_API_KEY: ${OPENWEATHER_API_KEY}
+      DATABASE_URL: ${DATABASE_URL}
+      FLASK_SECRET_KEY: ${FLASK_SECRET_KEY:-a_default_secret_key_if_not_set} # for development
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    command: flask run --host=0.0.0.0 --port=5000
+
+volumes:
+  postgres_data:
