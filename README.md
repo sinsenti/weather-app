@@ -64,7 +64,9 @@ You can:
 
 ```
 .
-├── app.py                 # Flask application code
+├── app.py                 # Flask application code, interaction between modules
+├── models.py              # handles external API logic only
+├── weather.py             # handles database connection and queries
 ├── Dockerfile             # Dockerfile for Flask app container
 ├── docker-compose.yml     # Docker Compose configuration
 ├── requirements.txt       # Python dependencies
