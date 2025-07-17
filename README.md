@@ -1,92 +1,115 @@
-# Weather App
+# Weather Query Flask App
 
-A Flask-based web application that allows users to fetch current weather information for cities using the OpenWeatherMap API and stores query history in a PostgreSQL database.
+A Flask web application that allows users to query current weather information for any city using the OpenWeatherMap API, and stores the query history in a PostgreSQL database.
 
 ## Features
 
-- Search current weather by city name.
-- Display temperature, weather description, humidity, and wind speed.
-- Persist weather query history in a PostgreSQL database.
-- View past queries with timestamps.
-- Dockerized for easy deployment and development.
+- Search for current weather by city name.
+- Display weather info: temperature, description, humidity, wind speed.
+- Backend built with Flask, PostgreSQL, and OpenWeatherMap API.
+- Fully dockerized for easy setup and deployment.
+- Automated testing with pytest.
 
 ## Prerequisites
 
-- Docker and Docker Compose installed on your machine.
-- An [OpenWeatherMap API key](https://openweathermap.org/api).
-- Git (optional, to clone this repository).
+- [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed.
+- An [OpenWeatherMap API Key](https://openweathermap.org/api).
 
 ## Getting Started
 
-### 1. Clone the Repository
+### 1. Clone the repository
 
 ```bash
-git clone 
-cd 
+git clone git@github.com:sinsenti/weather-app.git
+cd  weather-app
 ```
 
-### 2. Configure Environment Variables
+### 2. Create `.env` file
 
-Create a `.env` file in the root directory:
+Create a `.env` file in the root directory with your environment variables for API and database access:
 
 ```env
 OPENWEATHER_API_KEY=your_openweather_api_key_here
 DATABASE_URL=postgresql://weather_user:sin@db:5432/weather_db
 ```
 
-- **OPENWEATHER_API_KEY**: Required to access OpenWeatherMap API.
-- **DATABASE_URL**: Connection string for PostgreSQL database.
-- **FLASK_SECRET_KEY**: Used by Flask for sessions and security. Defaults to a random key if not set.
+ **Note:** Make sure `DATABASE_URL` matches the credentials in `docker-compose.yml`.
 
-### 3. Build and Run the Application with Docker Compose
+### 3. Build and run with Docker Compose
 
 ```bash
 docker-compose up --build
 ```
 
-This command will:
-- Spin up a PostgreSQL container initialized with the schema.
-- Build and launch the Flask web app container.
-- Map ports `5432` for PostgreSQL and `5000` for Flask app.
+- This command builds your app image and starts the PostgreSQL and Flask containers.
+- Database schema is initialized automatically when the DB container starts.
 
 ### 4. Access the Application
 
-Open your browser and go to:
+Open your browser and visit:
 
 [http://localhost:5000](http://localhost:5000)
 
-You can:
-
-- Enter a city name to fetch current weather.
-- View query history via the "History" page.
+- Use the input form on the homepage to search weather by city.
+- Visit `/history` to see the saved query history.
 
 ## Project Structure
 
 ```
 .
-├── app.py                 # Flask application code, interaction between modules
-├── models.py              # handles external API logic only
-├── weather.py             # handles database connection and queries
-├── Dockerfile             # Dockerfile for Flask app container
-├── docker-compose.yml     # Docker Compose configuration
+├── app.py                 # Flask application & routes
+├── models.py              # Database connection and queries
+├── weather.py             # Weather API integration
+├── Dockerfile             # Defines the Flask app container image
+├── docker-compose.yml     # Docker Compose config for app + DB
 ├── requirements.txt       # Python dependencies
-├── schema.sql             # SQL schema for PostgreSQL
-├── .env                   # Environment variables file (not tracked by Git)
-├── .gitignore             # Git ignore rules
-├── README.md              # This README file
-├── templates/             # HTML templates (index.html, history.html)
+├── schema.sql             # Database schema initialization
+├── .env                   # Environment variables (not version controlled)
+├── conftest.py            # Foundation to the falsk app testing
+├── test_app.py            # Testing Flask app behavior
+├── test_models.py         # Testing DB part
+├── test_weather.py        # Testing work of API
+├── templates/             # HTML templates (index, history)
 └── static/                # Static assets (if any)
 ```
 
+## Running Tests
 
-## Environment Variables Detail
+Tests are written with pytest and mock external dependencies.
 
-| Variable           | Description                                   | Required         |
-|--------------------|-----------------------------------------------|------------------|
-| `OPENWEATHER_API_KEY` | API key for OpenWeatherMap service           | Yes              |
-| `DATABASE_URL`        | PostgreSQL connection URL                     | Yes              |
+To run all tests:
+
+```bash
+docker-compose run web pytest
+```
+
+Or locally after installing dependencies:
+
+```bash
+pip install -r requirements.txt
+pytest
+```
+
+## Environment Variables
+
+| Variable            | Description                            | Required |
+|---------------------|-------------------------------------|----------|
+| `OPENWEATHER_API_KEY` | OpenWeatherMap API key               | Yes      |
+| `DATABASE_URL`        | PostgreSQL connection string         | Yes      |
+| `FLASK_SECRET_KEY`    | Flask session secret key (for security) | No (recommended) |
 
 ## Notes
 
-- The database password is currently set to `sin` (in both `.env` and `docker-compose.yml`). Change this if deploying in production.
-- Flask app runs in development mode by default (`debug=True` in `app.py`). Disable debug mode and set a secure secret key in production.
+- The PostgreSQL password is `sin` per default, synchronized in `.env` and `docker-compose.yml`.
+- For production, **change passwords and secret keys** to secure values.
+- Flask runs in debug mode by default for development; disable in production.
+- Health check makes sure Postgres container is ready before starting the web app.
+- Tests mock the database and API calls to keep tests reliable and fast.
+
+## Acknowledgments
+
+- [Flask](https://flask.palletsprojects.com/) for the web framework.
+- [PostgreSQL](https://www.postgresql.org/) as the database.
+- [OpenWeatherMap](https://openweathermap.org/api) for weather data.
+- [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/) for containerization.
+- [pytest](https://docs.pytest.org/) for testing support.
