@@ -65,6 +65,11 @@ Open your browser and visit:
 ├── requirements.txt       # Python dependencies
 ├── schema.sql             # Database schema initialization
 ├── .env                   # Environment variables (not version controlled)
+├── tests/                 # Directory with tests
+│   └── conftest.py        # Foundation to the falsk app testing
+│   └── test_app.py        # Testing Flask app behavior
+│   └── test_models.py     # Testing DB part
+│   └── test_weather.py    # Testing work of API
 ├── conftest.py            # Foundation to the falsk app testing
 ├── test_app.py            # Testing Flask app behavior
 ├── test_models.py         # Testing DB part
